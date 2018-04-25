@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Big Calculator Project" default="compile" basedir=".">
+  <!-- The project name is used as the javadoc title -->
+
+  <!-- If the project includes a runnable class -->
+  <property name="main.class" value="cisc187.bigcalc.Calc" />
+  <property name="overview" location="src/cisc187/bigcalc/overview.html" />
+
+
+  <path id="junit.jars">
+    <pathelement location="/Users/dparillo/bin/junit.jar" />
+    <pathelement location="/Users/dparillo/bin/hamcrest.jar" />
+  </path>
+
+  <!-- Should not need to edit anything after this comment -->
+
+  <property name="src.dir" location="src" />
+  <property name="test.dir" location="test" />
+  <property name="build.dir" location="bin" />
+  <property name="report.dir" location="test-results" />
+  <property name="doc.dir" location="doc" />
+
+  <target name="init">
+    <mkdir dir="${build.dir}"/>
+  </target>
+
+  <target name="init-test">
+    <mkdir dir="${report.dir}"/>
+  </target>
+
+  <!-- includeantruntime is a stupid ant 1.8 bug -->
+  <presetdef name="javac">
+    <javac includeantruntime="false" />
+  </presetdef>
+
+  <target name="compile"  depends="init"
+          description="Main build target.  Compiles project.">
+    <javac srcdir="${src.dir}" 
+      destdir="${build.dir}"
+      debug="true">
+    </javac>
+  </target>
+
+  <target name="compile-tests"  depends="compile">
+    <javac srcdir="${test.dir}" destdir="${build.dir}">
+      <classpath>
+        <path refid="junit.jars"/>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="run" depends="compile"
+    description="Runs the calculator using input from 'input.txt'">
+    <java classname="${main.class}" input="input.txt">
+      <classpath>
+        <pathelement location="${build.dir}"/>
+      </classpath>
+    </java>
+  </target>
+
+  <target name="clean"
+          description="Deletes all build and documentation artifacts.">
+    <delete dir="${build.dir}"/>
+    <delete dir="${doc.dir}"/>
+    <delete dir="${report.dir}"/>
+  </target>
+
+  <target name="test"  depends="compile-tests, init-test"
+          description="Runs all junit tests.">
+    <junit fork="yes" 
+      printsummary="yes" 
+      haltonfailure="yes">
+    <formatter type="plain"/>
+    <classpath>
+      <pathelement location="${build.dir}"/>
+      <path refid="junit.jars"/>
+    </classpath>
+    <batchtest todir="${report.dir}">
+      <fileset dir="${test.dir}"/>
+    </batchtest>
+    </junit>
+  </target>
+
+  <target name="doc" 
+          description="Builds project javadoc.">
+    <javadoc 
+      destdir="${doc.dir}"
+      sourcepath="src"
+      Overview="${overview}"
+      author="true"
+      version="true"
+      windowtitle="${ant.project.name}">
+      <doctitle>&lt;h2&gt;${ant.project.name}&lt;/h2&gt;</doctitle>
+    </javadoc>
+  </target>
+</project>
